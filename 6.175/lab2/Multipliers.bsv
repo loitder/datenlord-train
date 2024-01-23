@@ -47,31 +47,35 @@ module mkFoldedMultiplier( Multiplier#(n) );
     // You can use these registers or create your own if you want
     Reg#(Bit#(n)) a <- mkRegU();
     Reg#(Bit#(n)) b <- mkRegU();
-    Reg#(Bit#(n)) prod <- mkRegU();
-    Reg#(Bit#(n)) tp <- mkRegU();
-    Reg#(Bit#(TAdd#(TLog#(n),1))) i <- mkReg( fromInteger(valueOf(n)+1) );
+    Reg#(Bit#(n)) carry <- mkRegU();
+    Reg#(Bit#(n)) res <- mkRegU();
+    Reg#(Bit#(TAdd#(TLog#(n),1))) i <- mkReg( fromInteger(valueOf(n) + 1) );
 
-    rule mulStep;
-        // TODO: Implement this in Exercise 4
+    rule mulStep(i < fromInteger(valueOf(n)));
+        Bit#(TAdd#(n,1)) sum = zeroExtend(carry) + ((b[i] == 0) ? 0 : zeroExtend(a));
+        res[i] <= sum[0];
+        carry <= truncateLSB(sum);
+        i <= i + 1;
     endrule
 
     method Bool start_ready();
-        // TODO: Implement this in Exercise 4
-        return False;
+        return i == fromInteger(valueOf(n) + 1);
     endmethod
 
-    method Action start( Bit#(n) aIn, Bit#(n) bIn );
-        // TODO: Implement this in Exercise 4
+    method Action start( Bit#(n) aIn, Bit#(n) bIn ) if(i == fromInteger(valueOf(n) + 1));
+        a <= aIn;
+        b <= bIn;
+        i <= 0;
+        carry <= 0;
     endmethod
 
     method Bool result_ready();
-        // TODO: Implement this in Exercise 4
-        return False;
+        return i == fromInteger(valueOf(n));
     endmethod
 
     method ActionValue#(Bit#(TAdd#(n,n))) result();
-        // TODO: Implement this in Exercise 4
-        return 0;
+        i <= i + 1;
+        return {carry,res};
     endmethod
 endmodule
 

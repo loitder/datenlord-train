@@ -35,6 +35,9 @@ endmodule
 (* synthesize *)
 module mkTbEx5();
     // TODO: Implement test bench for Exercise 5
+    Multiplier#(8) dut <- mkFoldedMultiplier();
+    Empty tb <- mkTbMulModule(dut, multiply_unsigned, False);
+    return tb;
 endmodule
 
 (* synthesize *)
