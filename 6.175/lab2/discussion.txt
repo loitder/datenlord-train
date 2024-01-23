@@ -1,8 +1,50 @@
-1.
+1.Discussion Question 1 (1 Point): Hardware-wise, unsigned addition is the same as signed addition 
+    when using two's complement encoding. Using evidence from the test bench, 
+        is unsigned multiplication the same as signed multiplication?
 
-2.
+-----   
+    not same,the test bench output :
+        FAILED:
+            if signed: -26519 * 18547 test function gave -491847893 instead of 723648299
+            if unsigned: 39017 * 18547 test function gave 3803119403 instead of 723648299
+-----   
 
-3.
+2.Discussion Question 2 (2 Points): In mkTBDumb excluding the line
+        function Bit#(16) test_function( Bit#(8) a, Bit#(8) b ) = multiply_unsigned( a, b );
+and modifying the rest of the module to have
+
+    (* synthesize *)
+    module mkTbDumb();
+        Empty tb <- mkTbMulFunction(multiply_unsigned, multiply_unsigned, True);
+        return tb;
+    endmodule
+will result in a compilation error. What is that error? How does the original code fix the compilation error? 
+    You could also fix the error by having two function definitions as shown below.
+
+-----
+    "Bit vector of unknown size"
+-----
+
+
+    (* synthesize *)
+    module mkTbDumb();
+        function Bit#(16) test_function( Bit#(8) a, Bit#(8) b ) = multiply_unsigned( a, b );
+        function Bit#(16) ref_function( Bit#(8) a, Bit#(8) b ) = multiply_unsigned( a, b );
+        Empty tb <- mkTbMulFunction(test_function, ref_function, True);
+        return tb;
+    endmodule
+Why is two function definitions not necessary? (i.e. why can the second operand to mkTbMulFunction have variables in its type?) 
+Hint: Look at the types of the operands of mkTbMulFunction in TestBenchTemplates.bsv.
+
+-----
+    the compiler support automatic inference, the first parameter has specified the n(bit width) of the parameter
+-----
+
+3.Discussion Question 3 (1 Point): Is your implementation of multiply_by_adding a signed multiplier or an unsigned multiplier? (Note: if it does not match either multiply_signed or multiply_unsigned, it is wrong).
+
+-----
+    unsigned
+-----
 
 4.
 Current Bits | Previous Bit | Original Booth Encoding | Radix-4 Booth Encoding

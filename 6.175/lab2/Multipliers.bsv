@@ -18,7 +18,16 @@ endfunction
 // Multiplication by repeated addition
 function Bit#(TAdd#(n,n)) multiply_by_adding( Bit#(n) a, Bit#(n) b );
     // TODO: Implement this function in Exercise 2
-    return 0;
+    Bit#(n) res = 0;
+    Bit#(n) carry = 0;
+    for (Integer i = 0;i < valueOf(n);i = i + 1) begin
+        // 1101 * 1111 error : n-bit addition carry(n+1) will be ignored
+        // sum[i + bit_width - 1 : i] = sum[i + bit_width - 1 : i] + (b[i] == 0 ? 0 : a); 
+        Bit#(TAdd#(n,1)) sum  = zeroExtend(carry) + (b[i] == 0 ? 0 : zeroExtend(a));
+        res[i] = sum[0];
+        carry = truncateLSB(sum);
+    end
+    return {carry,res};
 endfunction
 
 
@@ -42,7 +51,7 @@ module mkFoldedMultiplier( Multiplier#(n) );
     Reg#(Bit#(n)) tp <- mkRegU();
     Reg#(Bit#(TAdd#(TLog#(n),1))) i <- mkReg( fromInteger(valueOf(n)+1) );
 
-    rule mulStep( /* guard goes here */ );
+    rule mulStep;
         // TODO: Implement this in Exercise 4
     endrule
 
@@ -75,7 +84,7 @@ module mkBoothMultiplier( Multiplier#(n) );
     Reg#(Bit#(TAdd#(TAdd#(n,n),1))) p <- mkRegU;
     Reg#(Bit#(TAdd#(TLog#(n),1))) i <- mkReg( fromInteger(valueOf(n)+1) );
 
-    rule mul_step( /* guard goes here */ );
+    rule mul_step;
         // TODO: Implement this in Exercise 6
     endrule
 
@@ -108,7 +117,7 @@ module mkBoothMultiplierRadix4( Multiplier#(n) );
     Reg#(Bit#(TAdd#(TAdd#(n,n),2))) p <- mkRegU;
     Reg#(Bit#(TAdd#(TLog#(n),1))) i <- mkReg( fromInteger(valueOf(n)/2+1) );
 
-    rule mul_step( /* guard goes here */ );
+    rule mul_step;
         // TODO: Implement this in Exercise 8
     endrule
 
