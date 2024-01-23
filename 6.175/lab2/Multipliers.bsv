@@ -80,6 +80,14 @@ module mkFoldedMultiplier( Multiplier#(n) );
 endmodule
 
 
+function Bit#(n) arth_shift(Bit#(n) a, Integer n,Bool direction);
+    Int#(n) a_int = unpack(a);
+    if (direction) begin
+        return pack(a_int >> n);
+    end else begin
+        return pack(a_int << n);
+    end
+endfunction
 
 // Booth Multiplier
 module mkBoothMultiplier( Multiplier#(n) );
@@ -88,27 +96,41 @@ module mkBoothMultiplier( Multiplier#(n) );
     Reg#(Bit#(TAdd#(TAdd#(n,n),1))) p <- mkRegU;
     Reg#(Bit#(TAdd#(TLog#(n),1))) i <- mkReg( fromInteger(valueOf(n)+1) );
 
-    rule mul_step;
-        // TODO: Implement this in Exercise 6
+    rule mul_step(i < fromInteger(valueOf(n)));
+        let pr = p[1:0];
+        Bit#(TAdd#(TAdd#(n,n),1)) temp = p;
+        if ( pr == 2'b01 ) begin
+            temp = p + m_pos;
+        end
+        if ( pr == 2'b10 ) begin
+            temp = p + m_neg;
+        end
+        p <= arth_shift(temp,1,True);
+        i <= i + 1;
+
+        // $display("m_pos : %b", m_pos );
+        // $display("m_neg : %b", m_neg );
+        // $display("p : %b", p );
     endrule
 
     method Bool start_ready();
-        // TODO: Implement this in Exercise 6
-        return False;
+        return i == fromInteger(valueOf(n) + 1);
     endmethod
 
-    method Action start( Bit#(n) m, Bit#(n) r );
-        // TODO: Implement this in Exercise 6
+    method Action start( Bit#(n) m, Bit#(n) r ) if (i == fromInteger(valueOf(n) + 1));
+        m_pos <= {m, 0};
+        m_neg <= {-m, 0};
+        p <= {0, r, 1'b0};
+        i <= 0;
     endmethod
 
     method Bool result_ready();
-        // TODO: Implement this in Exercise 6
-        return False;
+        return i == fromInteger(valueOf(n));
     endmethod
 
-    method ActionValue#(Bit#(TAdd#(n,n))) result();
-        // TODO: Implement this in Exercise 6
-        return 0;
+    method ActionValue#(Bit#(TAdd#(n,n))) result() if (i == fromInteger(valueOf(n)));
+        i <= i + 1;
+        return truncateLSB(p);
     endmethod
 endmodule
 

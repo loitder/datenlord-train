@@ -36,18 +36,24 @@ endmodule
 module mkTbEx5();
     // TODO: Implement test bench for Exercise 5
     Multiplier#(8) dut <- mkFoldedMultiplier();
-    Empty tb <- mkTbMulModule(dut, multiply_unsigned, False);
+    Empty tb <- mkTbMulModule(dut, multiply_by_adding, False);
     return tb;
 endmodule
 
 (* synthesize *)
 module mkTbEx7a();
     // TODO: Implement test bench for Exercise 7
+    Multiplier#(8) dut <- mkBoothMultiplier();
+    Empty tb <- mkTbMulModule(dut, multiply_signed, False);
+    return tb;
 endmodule
 
 (* synthesize *)
 module mkTbEx7b();
     // TODO: Implement test bench for Exercise 7
+    Multiplier#(4) dut <- mkBoothMultiplier();
+    Empty tb <- mkTbMulModule(dut, multiply_signed, False);
+    return tb;
 endmodule
 
 (* synthesize *)
